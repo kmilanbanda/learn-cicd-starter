@@ -1,15 +1,15 @@
 package auth
 
-import(
-	"testing"
+import (
 	"net/http"
+	"testing"
 )
 
-func TestGetAPIKeyNoHeader(t *testing.T) {	
+func TestGetAPIKeyNoHeader(t *testing.T) {
 	headers := http.Header{}
 	str, err := GetAPIKey(headers)
 	if str != "" || err != ErrNoAuthHeaderIncluded {
-		 t.Errorf("GetAPIKey() = (%v, %v), want ('', ErrNoAuthHeaderIncluded)", str, err)
+		t.Errorf("GetAPIKey() = (%v, %v), want ('', ErrNoAuthHeaderIncluded)", str, err)
 	}
 }
 
