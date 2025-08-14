@@ -5,17 +5,24 @@ on:
     branches: [main]
 
 jobs:
-  Deploy:
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     
     steps:
       - name: Check out code
         uses: actions/checkout@v4
 
+      - name: Install Goose
+        uses: curl -sSfL https://get.tur.so/install.sh | bash
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.23.0" 
+          go-version: "1.23.0"
+
+      - env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Build the app
         run: ./scripts/buildprod.sh
@@ -30,6 +37,9 @@ jobs:
 
       - name: Submit build
         run: gcloud builds submit --project notely-468520 --tag us-central1-docker.pkg.dev/notely-468520/notely-ar-repo/notely:latest .
+
+      - name: Run database migrations
+        run: ./scripts/migrateup.sh
 
       - name: Deploy to Cloud Run
         run: gcloud run deploy notely --image us-central1-docker.pkg.dev/notely-468520/notely-ar-repo/notely:latest --region us-central1 --allow-unauthenticated --project notely-468520 --max-instances=4
